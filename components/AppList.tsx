@@ -30,89 +30,100 @@ export default function AppList({ initialApps }: Props) {
   }, [initialApps, search, statusFilter, categoryFilter]);
 
   const stats = useMemo(() => {
-    const counts = initialApps.reduce((acc, app) => {
+    return initialApps.reduce((acc, app) => {
       acc[app.status] = (acc[app.status] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
-    return counts;
   }, [initialApps]);
 
   return (
-    <div className="space-y-6">
-      {/* Stats Ribbon */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        <button 
-            onClick={() => setStatusFilter('all')}
-            className={`badge badge-lg gap-2 cursor-pointer hover:scale-105 transition-transform ${statusFilter === 'all' ? 'badge-neutral' : 'badge-outline'}`}
-        >
-            All ({initialApps.length})
-        </button>
-        {Object.entries(stats).map(([status, count]) => (
-            <button 
-                key={status}
-                onClick={() => setStatusFilter(status as AppStatus)}
-                className={`badge badge-lg gap-2 cursor-pointer hover:scale-105 transition-transform ${statusFilter === status ? 'badge-primary' : 'badge-outline'}`}
-            >
-                <span className="capitalize">{status}</span> ({count})
-            </button>
-        ))}
+    <div className="space-y-8">
+      {/* Controls Section */}
+      <div className="bg-base-100 rounded-2xl p-1 md:p-2 border border-base-200 shadow-sm">
+         <div className="flex flex-col md:flex-row gap-4 p-2">
+             {/* Search */}
+             <div className="flex-1 relative">
+                <input
+                    type="text"
+                    placeholder="Search apps..."
+                    className="input input-bordered w-full pl-10 bg-base-100 focus:bg-base-100 transition-all"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                <svg className="absolute left-3 top-3.5 h-5 w-5 text-base-content/40" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+             </div>
+
+             {/* Filters */}
+             <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+                <select 
+                    className="select select-bordered"
+                    value={categoryFilter}
+                    onChange={(e) => setCategoryFilter(e.target.value as any)}
+                >
+                    <option value="all">All Categories</option>
+                    <option value="personal">Personal</option>
+                    <option value="work">Work</option>
+                    <option value="experiment">Experiment</option>
+                    <option value="archived">Archived</option>
+                </select>
+
+                <div className="join border border-base-300 bg-base-200/50 p-1 rounded-lg">
+                    <button 
+                        className={`join-item btn btn-sm border-0 ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'bg-transparent text-base-content/60'}`}
+                        onClick={() => setViewMode('grid')}
+                    >
+                        Grid
+                    </button>
+                    <button 
+                        className={`join-item btn btn-sm border-0 ${viewMode === 'list' ? 'bg-white shadow-sm' : 'bg-transparent text-base-content/60'}`}
+                        onClick={() => setViewMode('list')}
+                    >
+                        List
+                    </button>
+                </div>
+             </div>
+         </div>
+         
+         {/* Status Tags Row */}
+         <div className="flex gap-2 overflow-x-auto px-2 pb-2 md:pb-1 no-scrollbar pt-2 border-t border-base-100">
+             <button 
+                onClick={() => setStatusFilter('all')}
+                className={`btn btn-xs rounded-full normal-case font-medium ${statusFilter === 'all' ? 'btn-neutral' : 'btn-ghost'}`}
+             >
+                All
+                <span className="badge badge-sm badge-ghost ml-1">{initialApps.length}</span>
+             </button>
+             {Object.entries(stats).map(([status, count]) => (
+                <button 
+                    key={status}
+                    onClick={() => setStatusFilter(status as AppStatus)}
+                    className={`btn btn-xs rounded-full normal-case font-medium ${statusFilter === status ? 'btn-primary text-primary-content' : 'btn-ghost'}`}
+                >
+                    <span className="capitalize">{status}</span>
+                    <span className={`badge badge-sm ml-1 ${statusFilter === status ? 'badge-ghost' : 'badge-neutral'}`}>{count}</span>
+                </button>
+             ))}
+         </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex flex-col md:flex-row gap-4 bg-base-100 p-4 rounded-box shadow-sm border border-base-200">
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Search by name, description or tags..."
-            className="input input-bordered w-full"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        
-        <div className="flex gap-2">
-            <select 
-                className="select select-bordered"
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value as any)}
-            >
-                <option value="all">All Categories</option>
-                <option value="personal">Personal</option>
-                <option value="work">Work</option>
-                <option value="experiment">Experiment</option>
-                <option value="archived">Archived</option>
-            </select>
-
-            <div className="join border border-base-300">
-                <button 
-                    className={`join-item btn btn-sm ${viewMode === 'grid' ? 'btn-active' : ''}`}
-                    onClick={() => setViewMode('grid')}
-                >
-                    Grid
-                </button>
-                <button 
-                    className={`join-item btn btn-sm ${viewMode === 'list' ? 'btn-active' : ''}`}
-                    onClick={() => setViewMode('list')}
-                >
-                    List
-                </button>
-            </div>
-        </div>
-      </div>
-
-      {/* Results */}
-      {viewMode === 'grid' ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Grid View */}
+      {viewMode === 'grid' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredApps.map((app) => (
             <AppCard key={app.id} app={app} />
           ))}
         </div>
-      ) : (
-        <div className="overflow-x-auto bg-base-100 rounded-box border border-base-200">
+      )}
+
+      {/* List View */}
+      {viewMode === 'list' && (
+        <div className="overflow-x-auto bg-base-100 rounded-2xl border border-base-200 shadow-sm">
           <table className="table table-zebra w-full">
-            <thead>
+            <thead className="bg-base-200/50">
               <tr>
-                <th>Name</th>
+                <th>App Name</th>
                 <th>Status</th>
                 <th>Category</th>
                 <th>Stack</th>
@@ -122,16 +133,20 @@ export default function AppList({ initialApps }: Props) {
             </thead>
             <tbody>
               {filteredApps.map((app) => (
-                <tr key={app.id} className="hover">
-                  <td className="font-bold">{app.name}</td>
-                  <td><StatusBadge status={app.status} /></td>
-                  <td className="capitalize">{app.category}</td>
-                  <td className="text-sm opacity-70">
-                      {app.stack.frontend || app.stack.backend || 'N/A'}
-                  </td>
-                  <td>{app.dates.last_update}</td>
+                <tr key={app.id} className="hover group cursor-pointer" onClick={() => window.location.href = `/apps/${app.id}`}>
                   <td>
-                      <a href={`/apps/${app.id}`} className="btn btn-ghost btn-xs">View</a>
+                      <div className="font-bold">{app.name}</div>
+                      <div className="text-xs opacity-50 truncate max-w-[200px]">{app.description}</div>
+                  </td>
+                  <td><StatusBadge status={app.status} /></td>
+                  <td className="capitalize"><span className="badge badge-ghost badge-sm">{app.category}</span></td>
+                  <td className="text-sm opacity-70 font-mono text-xs">
+                      {app.stack.frontend && <span className="mr-2">FE: {app.stack.frontend}</span>}
+                      {app.stack.backend && <span>BE: {app.stack.backend}</span>}
+                  </td>
+                  <td className="text-sm opacity-60 tabular-nums">{app.dates.last_update}</td>
+                  <td className="text-right">
+                      <span className="btn btn-ghost btn-xs opacity-0 group-hover:opacity-100 transition-opacity">View</span>
                   </td>
                 </tr>
               ))}
@@ -141,13 +156,15 @@ export default function AppList({ initialApps }: Props) {
       )}
 
       {filteredApps.length === 0 && (
-        <div className="text-center py-20 bg-base-100 rounded-box border border-dashed border-base-300">
-          <h2 className="text-xl font-semibold">No apps match your filters</h2>
+        <div className="text-center py-20 bg-base-100 rounded-2xl border border-dashed border-base-300">
+          <div className="opacity-20 text-6xl mb-4">🔍</div>
+          <h2 className="text-xl font-semibold">No apps match your search</h2>
+          <p className="text-base-content/60 mb-4">Try adjusting your filters or search query.</p>
           <button 
-            className="btn btn-ghost btn-sm mt-2"
+            className="btn btn-outline btn-sm"
             onClick={() => { setSearch(''); setStatusFilter('all'); setCategoryFilter('all'); }}
           >
-            Clear all filters
+            Clear Filters
           </button>
         </div>
       )}
