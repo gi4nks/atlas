@@ -17,6 +17,7 @@ help:
 	@echo "  make add-app APP_NAME=name - Create a new app YAML from template"
 	@echo "  make scan APP_NAME=name    - Auto-scan folder and generate YAML"
 	@echo "  make smart-scan APP_NAME=name - Smart-scan using Gemini AI"
+	@echo "  make sync-github  - Push to GitHub excluding .gitea folder"
 
 install:
 	npm install
@@ -58,3 +59,22 @@ scan:
 
 smart-scan:
 	npm run smart-scan $(APP_NAME)
+
+sync-github:
+	@if [ -n "$$(git status --porcelain)" ]; then \
+		echo "Error: Working directory is not clean. Please commit or stash changes first."; \
+		exit 1; \
+	fi
+	@if ! git remote | grep -q "^github$$"; then \
+		echo "Error: Remote 'github' not found. Add it with: git remote add github <url>"; \
+		exit 1; \
+	fi
+	@echo "Syncing to GitHub..."
+	@git checkout -B github-sync-temp
+	@git rm -r --cached .gitea > /dev/null 2>&1 || true
+	@rm -rf .gitea
+	@git commit -m "chore: sync to github (excluding .gitea)" --allow-empty --no-verify
+	@git push github github-sync-temp:main --force
+	@git checkout main
+	@git branch -D github-sync-temp
+	@echo "Successfully pushed to GitHub!"
