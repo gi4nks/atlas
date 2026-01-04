@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Atlas
 
-## Getting Started
+Atlas is a lightweight internal web application to catalog, track, and manage multiple personal software applications and experiments.
 
-First, run the development server:
+It is designed to be the "One Source of Truth" for your projects, restoring clarity and ownership.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🚀 Features
+
+- **Data First:** All data is stored in simple YAML files in `apps/`.
+- **Overview:** View all your apps, filtered by status, category, etc.
+- **Details:** Deep dive into each app's stack, running instructions, and future ideas.
+- **Zero Config:** No database, no auth, just files.
+
+## 📂 Project Structure
+
+```
+/gi4nks
+  /apps           # WHERE YOUR DATA LIVES (One YAML per app).
+  /templates      # Templates for new apps.
+  /atlas          # Next.js Application source code.
+    /app            # Next.js App Router source code.
+    /components     # React components.
+    /lib            # Backend logic (file reading).
+    /types          # TypeScript definitions.
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ How to Add a New App
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1.  From the `gi4nks` root (parent of `atlas`):
+    ```bash
+    cp templates/app.template.yml apps/my-new-app.yml
+    ```
+2.  Edit the YAML file with your app's details.
+3.  Refresh Atlas!
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 💻 Tech Stack
 
-## Learn More
+- **Framework:** Next.js 15 (App Router)
+- **Styling:** Tailwind CSS + DaisyUI
+- **Data:** Local File System (YAML)
 
-To learn more about Next.js, take a look at the following resources:
+## 🏃‍♂️ Running Locally
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1.  Install dependencies:
+    ```bash
+    npm install
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2.  Run the development server:
+    ```bash
+    npm run dev
+    ```
 
-## Deploy on Vercel
+3.  Open [http://localhost:3000](http://localhost:3000).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🐳 Running with Docker
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+You can run Atlas using Docker. The `../apps` folder is mounted as a volume to `/apps` inside the container, matching the application's internal search path.
+
+1.  Build and start the container:
+    ```bash
+    docker-compose up -d
+    ```
+
+2.  Atlas will be available at [http://localhost:3000](http://localhost:3000).
+
+## 🔮 Roadmap
+
+- [ ] Search functionality (Client-side)
+- [ ] Filtering by Status/Category
+- [ ] Auto-import git metadata
+- [ ] Health scores
