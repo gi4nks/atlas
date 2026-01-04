@@ -11,9 +11,9 @@ export default function AppCard({ app }: Props) {
   return (
     <Link 
       href={`/apps/${app.id}`} 
-      className="group block card bg-base-100 shadow-sm hover:shadow-xl transition-all duration-300 border border-base-200 hover:-translate-y-1 overflow-hidden"
+      className="group block h-full card bg-base-100 shadow-sm hover:shadow-xl transition-all duration-300 border border-base-200 hover:-translate-y-1 overflow-hidden"
     >
-      <div className="card-body p-6">
+      <div className="card-body p-6 flex flex-col h-full">
         <div className="flex justify-between items-start gap-4 mb-2">
            <h2 className="card-title text-lg font-bold tracking-tight group-hover:text-primary transition-colors">
               {app.name}
