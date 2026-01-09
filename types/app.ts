@@ -53,6 +53,7 @@ export interface AppData {
   repository: AppRepository;
   dates: AppDates;
   run: AppRun;
+  usage: string | null;
   dependencies: AppDependencies;
   known_issues: string[];
   next_steps: string[];

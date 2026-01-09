@@ -4,6 +4,9 @@ import CategoryBadge from '@/components/CategoryBadge';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 export const dynamic = 'force-dynamic';
 
 interface Props {
@@ -136,6 +139,23 @@ export default async function AppDetail({ params }: Props) {
                     )}
                 </div>
             </section>
+
+            {/* Usage Guide */}
+            {app.usage && (
+                <section>
+                    <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                        <span className="w-8 h-8 rounded bg-accent/10 text-accent flex items-center justify-center text-sm">📖</span>
+                        Usage Guide
+                    </h3>
+                    <div className="bg-base-100 p-6 rounded-xl border border-base-200 prose prose-sm max-w-none prose-headings:font-bold prose-h3:text-lg prose-pre:bg-[#1e1e1e] prose-pre:text-gray-300">
+                         <ReactMarkdown 
+                            remarkPlugins={[remarkGfm]}
+                         >
+                            {app.usage}
+                         </ReactMarkdown>
+                    </div>
+                </section>
+            )}
             
             {/* Status Lists */}
             <div className="grid md:grid-cols-2 gap-8">

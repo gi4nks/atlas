@@ -60,6 +60,7 @@ RULES:
 5. Be smart about 'category' and 'status' based on the context.
 6. Extract 'next_steps', 'known_issues', and 'future_ideas' if found in the text.
 7. Set 'dates.last_update' to today: ${new Date().toISOString().split('T')[0]}.
+8. Extract general usage instructions into 'usage' field if found (e.g. how to log in, key features). Use Markdown string format. If none, leave null.
 
 TEMPLATE:
 ${templateContent}
