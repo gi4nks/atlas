@@ -1,15 +1,15 @@
-import fs from 'fs';
+import fs from 'fs/promises';
+import { existsSync } from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import * as dotenv from 'dotenv';
+import { APPS_DIR, TEMPLATE_PATH } from './config';
 
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
-const APPS_DIR = path.join(process.cwd(), '..', 'apps');
-const TEMPLATE_PATH = path.join(process.cwd(), '..', 'templates', 'app.template.yml');
-const BASE_DIR = path.join(process.cwd(), '..');
+const BASE_DIR = path.join(APPS_DIR, '..');
 
 async function main() {
     const targetDir = process.argv[2];
@@ -25,8 +25,14 @@ async function main() {
     }
 
     const fullPath = path.join(BASE_DIR, targetDir);
-    if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isDirectory()) {
+    if (!existsSync(fullPath)) {
         console.error(`Error: Directory "${targetDir}" not found in ${BASE_DIR}`);
+        process.exit(1);
+    }
+    
+    const stats = await fs.stat(fullPath);
+    if (!stats.isDirectory()) {
+        console.error(`Error: "${targetDir}" is not a directory.`);
         process.exit(1);
     }
 
@@ -38,13 +44,14 @@ async function main() {
     const filesToRead = ['README.md', 'package.json', 'go.mod', 'GEMINI.md', 'PLAN.md'];
     for (const file of filesToRead) {
         const filePath = path.join(fullPath, file);
-        if (fs.existsSync(filePath)) {
+        if (existsSync(filePath)) {
+            const fileContent = await fs.readFile(filePath, 'utf8');
             context += `\n--- File: ${file} ---\n`;
-            context += fs.readFileSync(filePath, 'utf8').slice(0, 2000); // Grab first 2k chars
+            context += fileContent.slice(0, 2000); // Grab first 2k chars
         }
     }
 
-    const templateContent = fs.readFileSync(TEMPLATE_PATH, 'utf8');
+    const templateContent = await fs.readFile(TEMPLATE_PATH, 'utf8');
 
     const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
@@ -78,7 +85,7 @@ ${context}
         text = text.replace(/```yaml/g, '').replace(/```/g, '').trim();
 
         const outputPath = path.join(APPS_DIR, `${targetDir}.yml`);
-        fs.writeFileSync(outputPath, text);
+        await fs.writeFile(outputPath, text);
         console.log(`✅ Success! Smart YAML created at ${outputPath}`);
     } catch (error) {
         console.error('Error calling Gemini API:', error);

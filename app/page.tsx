@@ -3,8 +3,8 @@ import AppList from '@/components/AppList';
 
 export const dynamic = 'force-dynamic';
 
-export default function Home() {
-  const apps = getAllApps();
+export default async function Home() {
+  const apps = await getAllApps();
 
   return (
     <div className="container mx-auto p-4 md:p-8">

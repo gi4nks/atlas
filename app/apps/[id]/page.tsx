@@ -14,7 +14,7 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  const apps = getAllApps();
+  const apps = await getAllApps();
   return apps.map((app) => ({
     id: app.id,
   }));
@@ -22,7 +22,7 @@ export async function generateStaticParams() {
 
 export default async function AppDetail({ params }: Props) {
   const { id } = await params;
-  const app = getAppData(id);
+  const app = await getAppData(id);
 
   if (!app) {
     notFound();

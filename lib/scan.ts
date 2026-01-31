@@ -1,29 +1,30 @@
-import fs from 'fs';
+import fs from 'fs/promises';
+import { existsSync } from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
 import { AppData } from '../types/app';
+import { APPS_DIR, TEMPLATE_PATH } from './config';
 
-const APPS_DIR = path.join(process.cwd(), '..', 'apps');
-const TEMPLATE_PATH = path.join(process.cwd(), '..', 'templates', 'app.template.yml');
-const BASE_DIR = path.join(process.cwd(), '..');
+const BASE_DIR = path.join(APPS_DIR, '..');
 
 /**
  * Basic scanner to guess app info from a directory
  */
-function scanDirectory(dirName: string): Partial<AppData> {
+async function scanDirectory(dirName: string): Promise<Partial<AppData>> {
     const fullPath = path.join(BASE_DIR, dirName);
-    const stats = fs.statSync(fullPath);
+    const stats = await fs.stat(fullPath);
     
-    const hasPackageJson = fs.existsSync(path.join(fullPath, 'package.json'));
-    const hasGoMod = fs.existsSync(path.join(fullPath, 'go.mod'));
-    const hasDockerfile = fs.existsSync(path.join(fullPath, 'Dockerfile')) || fs.existsSync(path.join(fullPath, 'docker-compose.yml'));
-    const hasReadme = fs.existsSync(path.join(fullPath, 'README.md'));
+    const hasPackageJson = existsSync(path.join(fullPath, 'package.json'));
+    const hasGoMod = existsSync(path.join(fullPath, 'go.mod'));
+    const hasDockerfile = existsSync(path.join(fullPath, 'Dockerfile')) || existsSync(path.join(fullPath, 'docker-compose.yml'));
+    const hasReadme = existsSync(path.join(fullPath, 'README.md'));
     
     let frontend = null;
     let backend = null;
     
     if (hasPackageJson) {
-        const pkg = JSON.parse(fs.readFileSync(path.join(fullPath, 'package.json'), 'utf8'));
+        const pkgContent = await fs.readFile(path.join(fullPath, 'package.json'), 'utf8');
+        const pkg = JSON.parse(pkgContent);
         if (pkg.dependencies?.next) frontend = 'Next.js';
         else if (pkg.dependencies?.react) frontend = 'React';
     }
@@ -42,8 +43,8 @@ function scanDirectory(dirName: string): Partial<AppData> {
             infra: hasDockerfile ? 'Docker' : null
         },
         health: {
-            has_tests: fs.existsSync(path.join(fullPath, 'tests')) || fs.existsSync(path.join(fullPath, 'test')),
-            has_ci: fs.existsSync(path.join(fullPath, '.github')) || fs.existsSync(path.join(fullPath, '.gitlab-ci.yml')),
+            has_tests: existsSync(path.join(fullPath, 'tests')) || existsSync(path.join(fullPath, 'test')),
+            has_ci: existsSync(path.join(fullPath, '.github')) || existsSync(path.join(fullPath, '.gitlab-ci.yml')),
             has_docker: hasDockerfile,
             has_readme: hasReadme
         },
@@ -63,19 +64,26 @@ async function main() {
     }
 
     const fullPath = path.join(BASE_DIR, targetDir);
-    if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isDirectory()) {
+    if (!existsSync(fullPath)) {
         console.error(`Error: Directory "${targetDir}" not found in ${BASE_DIR}`);
         process.exit(1);
     }
+    
+    const stats = await fs.stat(fullPath);
+    if (!stats.isDirectory()) {
+        console.error(`Error: "${targetDir}" is not a directory.`);
+        process.exit(1);
+    }
 
-    if (fs.existsSync(path.join(APPS_DIR, `${targetDir}.yml`))) {
+    if (existsSync(path.join(APPS_DIR, `${targetDir}.yml`))) {
         console.error(`Error: YAML for "${targetDir}" already exists in apps/`);
         process.exit(1);
     }
 
     console.log(`Scanning ${targetDir}...`);
-    const guessedData = scanDirectory(targetDir);
-    const template = yaml.load(fs.readFileSync(TEMPLATE_PATH, 'utf8')) as any;
+    const guessedData = await scanDirectory(targetDir);
+    const templateContent = await fs.readFile(TEMPLATE_PATH, 'utf8');
+    const template = yaml.load(templateContent) as any;
 
     // Merge template with guessed data
     const finalData = {
@@ -89,8 +97,9 @@ async function main() {
     const yamlStr = yaml.dump(finalData, { lineWidth: -1 });
     const outputPath = path.join(APPS_DIR, `${targetDir}.yml`);
     
-    fs.writeFileSync(outputPath, yamlStr);
+    await fs.writeFile(outputPath, yamlStr);
     console.log(`✅ Success! Created ${outputPath}`);
 }
 
 main().catch(console.error);
+

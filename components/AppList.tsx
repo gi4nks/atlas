@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { AppData, AppStatus, AppCategory } from '@/types/app';
 import AppCard from './AppCard';
 import StatusBadge from './StatusBadge';
@@ -10,10 +11,38 @@ interface Props {
 }
 
 export default function AppList({ initialApps }: Props) {
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<AppStatus | 'all'>('all');
-  const [categoryFilter, setCategoryFilter] = useState<AppCategory | 'all'>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Initialize state from URL
+  const [search, setSearch] = useState(searchParams.get('q') || '');
+  const [statusFilter, setStatusFilter] = useState<AppStatus | 'all'>((searchParams.get('status') as AppStatus) || 'all');
+  const [categoryFilter, setCategoryFilter] = useState<AppCategory | 'all'>((searchParams.get('category') as AppCategory) || 'all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(searchParams.get('view') === 'list' ? 'list' : 'grid');
+
+  // Update URL when filters change
+  const createQueryString = useCallback(
+    (params: Record<string, string | null>) => {
+      const newParams = new URLSearchParams(searchParams.toString());
+      
+      Object.entries(params).forEach(([name, value]) => {
+        if (value === null || value === 'all' || value === '') {
+          newParams.delete(name);
+        } else {
+          newParams.set(name, value);
+        }
+      });
+ 
+      return newParams.toString();
+    },
+    [searchParams]
+  );
+
+  const updateFilters = (updates: Record<string, string | null>) => {
+    const queryString = createQueryString(updates);
+    router.push(`${pathname}${queryString ? '?' + queryString : ''}`, { scroll: false });
+  };
 
   const filteredApps = useMemo(() => {
     return initialApps.filter((app) => {
@@ -48,7 +77,10 @@ export default function AppList({ initialApps }: Props) {
                     placeholder="Search apps..."
                     className="input input-bordered w-full pl-10 bg-base-100 focus:bg-base-100 transition-all"
                     value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    onChange={(e) => {
+                        setSearch(e.target.value);
+                        updateFilters({ q: e.target.value });
+                    }}
                 />
                 <svg className="absolute left-3 top-3.5 h-5 w-5 text-base-content/40" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -60,7 +92,11 @@ export default function AppList({ initialApps }: Props) {
                 <select 
                     className="select select-bordered"
                     value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value as any)}
+                    onChange={(e) => {
+                        const val = e.target.value as any;
+                        setCategoryFilter(val);
+                        updateFilters({ category: val });
+                    }}
                 >
                     <option value="all">All Categories</option>
                     <option value="personal">Personal</option>
@@ -72,13 +108,19 @@ export default function AppList({ initialApps }: Props) {
                 <div className="join border border-base-300 bg-base-200/50 p-1 rounded-lg">
                     <button 
                         className={`join-item btn btn-sm border-0 ${viewMode === 'grid' ? 'bg-white shadow-sm' : 'bg-transparent text-base-content/60'}`}
-                        onClick={() => setViewMode('grid')}
+                        onClick={() => {
+                            setViewMode('grid');
+                            updateFilters({ view: 'grid' });
+                        }}
                     >
                         Grid
                     </button>
                     <button 
                         className={`join-item btn btn-sm border-0 ${viewMode === 'list' ? 'bg-white shadow-sm' : 'bg-transparent text-base-content/60'}`}
-                        onClick={() => setViewMode('list')}
+                        onClick={() => {
+                            setViewMode('list');
+                            updateFilters({ view: 'list' });
+                        }}
                     >
                         List
                     </button>
@@ -89,7 +131,10 @@ export default function AppList({ initialApps }: Props) {
          {/* Status Tags Row */}
          <div className="flex gap-2 overflow-x-auto px-2 pb-2 md:pb-1 no-scrollbar pt-2 border-t border-base-100">
              <button 
-                onClick={() => setStatusFilter('all')}
+                onClick={() => {
+                    setStatusFilter('all');
+                    updateFilters({ status: 'all' });
+                }}
                 className={`btn btn-xs rounded-full normal-case font-medium ${statusFilter === 'all' ? 'btn-neutral' : 'btn-ghost'}`}
              >
                 All
@@ -98,7 +143,10 @@ export default function AppList({ initialApps }: Props) {
              {Object.entries(stats).map(([status, count]) => (
                 <button 
                     key={status}
-                    onClick={() => setStatusFilter(status as AppStatus)}
+                    onClick={() => {
+                        setStatusFilter(status as AppStatus);
+                        updateFilters({ status });
+                    }}
                     className={`btn btn-xs rounded-full normal-case font-medium ${statusFilter === status ? 'btn-primary text-primary-content' : 'btn-ghost'}`}
                 >
                     <span className="capitalize">{status}</span>
