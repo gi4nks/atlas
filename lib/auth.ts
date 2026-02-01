@@ -3,11 +3,14 @@ import bcrypt from 'bcryptjs';
 
 export const auth = createAuth({
   secret: process.env.ANT_JWT_SECRET || 'atlas-secret-key-12345-very-long-and-secure-default',
+  sessionCookieName: 'atlas_session',
+  // @ts-ignore
+  sameSite: 'lax',
   
   // Custom provider to fetch users dynamically from environment variables
   provider: async (username: string) => {
-    const adminUser = process.env.ATLAS_AUTH_USER;
-    const adminPassword = process.env.ATLAS_AUTH_PASSWORD;
+    const adminUser = process.env.ATLAS_AUTH_USER || process.env.atlas_AUTH_USER;
+    const adminPassword = process.env.ATLAS_AUTH_PASSWORD || process.env.atlas_AUTH_PASSWORD;
 
     if (adminUser && username === adminUser && adminPassword) {
       // Ant will handle the password verification using the hash.

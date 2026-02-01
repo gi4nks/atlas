@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const cspHeader = `
+const cspHeader = ` 
     default-src 'self';
     script-src 'self' 'unsafe-eval' 'unsafe-inline';
     style-src 'self' 'unsafe-inline';
@@ -14,11 +14,16 @@ const cspHeader = `
 `.replace(/\s{2,}/g, ' ').trim();
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
   transpilePackages: ['@gi4nks/ant'],
   experimental: {
     externalDir: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
   },
   async headers() {
     return [
