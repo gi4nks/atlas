@@ -6,12 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "scan": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' lib/scan.ts",
-    "smart-scan": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' lib/smart-scan.ts"
+    "lint": "eslint"
   },
   "dependencies": {
-    "@gi4nks/ant": "^1.2.1",
+    "@gi4nks/ant": "^2.0.0",
     "@google/generative-ai": "^0.24.1",
     "@types/js-yaml": "^4.0.9",
     "bcryptjs": "^3.0.3",

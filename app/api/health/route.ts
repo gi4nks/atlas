@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { discoverYamlFiles } from '@/lib/discovery';
+import { getApps } from '@/lib/apps';
 
 export async function GET() {
   try {
-    const apps = await discoverYamlFiles();
+    const apps = await getApps();
     
     return NextResponse.json({
       status: 'ok',

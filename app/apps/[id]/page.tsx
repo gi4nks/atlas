@@ -1,6 +1,7 @@
 import { getAppData, getAllApps } from '@/lib/api';
 import StatusBadge from '@/components/StatusBadge';
 import CategoryBadge from '@/components/CategoryBadge';
+import AppActions from '@/components/AppActions';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -34,12 +35,15 @@ export default async function AppDetail({ params }: Props) {
       {/* Hero Header */}
       <div className="bg-base-200/30 border-b border-base-200">
         <div className="container mx-auto px-4 py-8 md:py-12">
-            <div className="text-sm breadcrumbs mb-6 text-base-content/60">
-                <ul>
-                    <li><Link href="/">Atlas</Link></li>
-                    <li><Link href="/">Apps</Link></li>
-                    <li>{app.name}</li>
-                </ul>
+            <div className="flex justify-between items-start mb-6">
+                <div className="text-sm breadcrumbs text-base-content/60">
+                    <ul>
+                        <li><Link href="/">Atlas</Link></li>
+                        <li><Link href="/">Apps</Link></li>
+                        <li>{app.name}</li>
+                    </ul>
+                </div>
+                <AppActions app={app} />
             </div>
 
             <div className="flex flex-col md:flex-row gap-6 md:items-start justify-between">

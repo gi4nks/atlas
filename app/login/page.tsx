@@ -35,24 +35,24 @@ export default function LoginPage() {
     <div className="min-h-screen bg-base-200 flex items-center justify-center p-4 font-sans">
       <div className="max-w-md w-full">
         <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-4 border border-primary/20">
-                <span className="text-4xl">🗺️</span>
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-4 border border-primary/20">
+                <span className="text-3xl">🗺️</span>
             </div>
-            <h1 className="text-4xl font-black text-base-content tracking-tighter uppercase mb-2">Atlas</h1>
-            <p className="text-base-content/60 text-xs font-bold uppercase tracking-[0.3em]">Project Catalog</p>
+            <h1 className="text-3xl font-bold text-base-content tracking-tight mb-1">Atlas</h1>
+            <p className="text-base-content/60 text-sm">Project Catalog Access</p>
         </div>
 
-        <div className="card bg-base-100 shadow-xl border border-base-300">
+        <div className="card bg-base-100 shadow-xl border border-base-200">
           <div className="card-body">
-            <form onSubmit={handleLogin} className="space-y-6">
+            <form onSubmit={handleLogin} className="space-y-4">
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text text-[10px] font-black uppercase tracking-widest">Agent ID</span>
+                  <span className="label-text font-medium">Username</span>
                 </label>
                 <input
                   type="text"
                   className="input input-bordered w-full"
-                  placeholder="Username"
+                  placeholder="Enter username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -60,7 +60,7 @@ export default function LoginPage() {
               </div>
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text text-[10px] font-black uppercase tracking-widest">Access Code</span>
+                  <span className="label-text font-medium">Password</span>
                 </label>
                 <input
                   type="password"
@@ -73,7 +73,7 @@ export default function LoginPage() {
               </div>
 
               {error && (
-                <div className="alert alert-error text-xs font-bold py-2">
+                <div className="alert alert-error text-sm py-2 rounded-lg">
                   <span>{error}</span>
                 </div>
               )}
@@ -81,12 +81,12 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="btn btn-primary w-full uppercase tracking-widest text-xs"
+                className="btn btn-primary w-full"
               >
                 {loading ? (
-                  <span className="loading loading-spinner loading-xs"></span>
+                  <span className="loading loading-spinner loading-sm"></span>
                 ) : (
-                  <>Authorize Access</>
+                  <>Sign In</>
                 )}
               </button>
             </form>
@@ -94,7 +94,7 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-8 text-center">
-            <p className="text-base-content/40 text-[9px] uppercase tracking-widest font-mono">Secured local catalog | forensic-encryption-v1</p>
+            <p className="text-base-content/40 text-xs">Internal Project Tracking System</p>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { getAllApps } from '@/lib/api';
 import AppList from '@/components/AppList';
+import NewAppModal from '@/components/NewAppModal';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,11 +9,14 @@ export default async function Home() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight mb-2">My Apps</h1>
-        <p className="text-base-content/60">
-           Manage and track your {apps.length} applications and projects.
-        </p>
+      <div className="mb-8 flex justify-between items-end">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight mb-2">My Apps</h1>
+          <p className="text-base-content/60">
+             Manage and track your {apps.length} applications and projects.
+          </p>
+        </div>
+        <NewAppModal />
       </div>
 
       <AppList initialApps={apps} />

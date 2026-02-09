@@ -3,19 +3,15 @@
 ## Project Structure & Module Organization
 - `app/`: Next.js App Router routes, layouts, and server components.
 - `components/`: Reusable React UI components.
-- `lib/`: Backend helpers and CLI-style scripts (scan/smart-scan).
+- `lib/`: Consolidated backend logic (`lib/apps.ts`) and shared schemas.
 - `types/`: Shared TypeScript types.
-- `public/`: Static assets.
-- Data lives outside this repo in `../apps/*.yml`; templates live in `../templates/`.
+- Data lives in `../apps/*.yml`; templates in `../templates/`.
 
-## Build, Test, and Development Commands
-- `npm run dev` / `make dev`: Start the local dev server (http://localhost:3000).
-- `npm run build` / `make build`: Create a production build.
-- `npm run start` / `make start`: Run the production server.
-- `npm run lint` / `make lint`: Run ESLint.
-- `npm run scan <name>` / `make scan APP_NAME=name`: Generate a YAML entry from a folder.
-- `npm run smart-scan <name>` / `make smart-scan APP_NAME=name`: AI-assisted scan (requires `GEMINI_API_KEY`).
-- `docker compose up -d` / `docker-compose up -d` / `make docker-up`: Run via Docker Compose.
+## Build and Development Commands
+- `npm run dev`: Start local dev server.
+- `npm run build`: Production build.
+- `npm run lint`: ESLint check.
+- **Note:** Scanning and project management are now handled directly via the Web UI (Smart Scan feature).
 
 ## Coding Style & Naming Conventions
 - TypeScript + React; follow the rules in `eslint.config.mjs`.

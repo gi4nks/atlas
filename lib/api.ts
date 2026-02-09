@@ -1,1 +1,1 @@
-export { getAllApps, getAppData } from './repository';
+export { getApps as getAllApps, getAppById as getAppData } from './apps';
